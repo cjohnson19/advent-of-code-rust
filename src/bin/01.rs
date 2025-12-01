@@ -37,9 +37,11 @@ pub fn part_one(input: &str) -> Option<u64> {
     let mut pos = 50;
     for Move(dir, n) in parse_moves(input) {
         let n = n % 100;
+        // We only care about the final position, so I adjust leftward movement
+        // into rightward, then modulo it back. This way, I don't have to deal
+        // with negative numbers
         let n = if dir == Dir::Left { 100 - n } else { n };
-        pos += n;
-        pos = pos % 100;
+        pos = (pos + n) % 100;
         if pos == 0 {
             ans += 1;
         }
@@ -55,10 +57,16 @@ pub fn part_two(input: &str) -> Option<u64> {
         // add one for every time it would have overlapped by rotating 360 deg
         ans += (n as u64) / 100;
         let n = n % 100;
+        // prevent double counting if n is multiple of 100.
+        if n == 0 {
+            continue;
+        }
         match dir {
             Dir::Left => {
                 let mut new_pos = pos - n;
                 if new_pos <= 0 {
+                    // new_pos may be negative, but we don't count it as another
+                    // pass over 0 if the previous motion ended at 0
                     if pos != 0 {
                         ans += 1;
                     }
