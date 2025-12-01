@@ -1,3 +1,17 @@
 pub mod template;
 
-// Use this file to add helper functions and additional modules.
+pub type Coord = (usize, usize);
+
+pub fn ortho_neighbors(
+    (x, y): (usize, usize),
+    w: usize,
+    h: usize,
+) -> impl Iterator<Item = (usize, usize)> {
+    const DIRS: [(isize, isize); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
+
+    DIRS.into_iter().filter_map(move |(dx, dy)| {
+        let nx = x.checked_add_signed(dx)?;
+        let ny = y.checked_add_signed(dy)?;
+        (nx < w && ny < h).then_some((nx, ny))
+    })
+}

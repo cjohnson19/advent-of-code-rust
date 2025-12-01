@@ -1,0 +1,98 @@
+use std::str::FromStr;
+
+advent_of_code::solution!(1);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum Dir {
+    Left,
+    Right,
+}
+
+impl FromStr for Dir {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "L" => Ok(Dir::Left),
+            "R" => Ok(Dir::Right),
+            _ => Err(format!("Invalid direction: {s}")),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Move(Dir, i64);
+
+fn parse_moves(input: &str) -> Vec<Move> {
+    input
+        .lines()
+        .map(|line| {
+            let (dir, steps) = line.split_at(1);
+            Move(dir.parse().unwrap(), steps.parse().unwrap())
+        })
+        .collect()
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    let mut ans = 0;
+    let mut pos = 50;
+    for Move(dir, n) in parse_moves(input) {
+        let n = n % 100;
+        let n = if dir == Dir::Left { 100 - n } else { n };
+        pos += n;
+        pos = pos % 100;
+        if pos == 0 {
+            ans += 1;
+        }
+    }
+
+    Some(ans)
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    let mut ans: u64 = 0;
+    let mut pos = 50;
+    for Move(dir, n) in parse_moves(input) {
+        // add one for every time it would have overlapped by rotating 360 deg
+        ans += (n as u64) / 100;
+        let n = n % 100;
+        match dir {
+            Dir::Left => {
+                let mut new_pos = pos - n;
+                if new_pos <= 0 {
+                    if pos != 0 {
+                        ans += 1;
+                    }
+                    new_pos = 100 - new_pos.abs();
+                }
+                pos = new_pos;
+            }
+            Dir::Right => {
+                pos += n;
+                // If pos is greater than or equal to 100, it passed over zero at some point
+                if pos >= 100 {
+                    ans += 1;
+                }
+            }
+        }
+        pos = pos % 100;
+    }
+
+    Some(ans)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(3));
+    }
+
+    #[test]
+    fn test_part_two() {
+        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(6));
+    }
+}
