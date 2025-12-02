@@ -53,15 +53,38 @@ fn is_n_repetitions(n: usize) -> bool {
     let l = s.len();
     // look at all subsequences up to the halfway point
     for split_point in 1..=l / 2 {
-        if s.chars()
-            .chunks(split_point)
-            .into_iter()
-            .map(|chunk| chunk.collect::<String>())
-            .tuple_windows::<(_, _)>()
-            .all(|(x, y)| x == y)
-        {
+        // post-solution adjustment - faster since we are only operating over
+        // string slices, but it's much harder to read
+        let chunk = &s[..split_point];
+        let mut i = 0;
+        let mut is_rep = true;
+        // iterate through chunks of size `split_point`
+        while i < l {
+            // if `i + split_point > l` then the string is not a perfect series
+            // of chunks size `split_point`, so it is not a repetition of the
+            // subsequence.
+            if i + split_point > l || &s[i..i + split_point] != chunk {
+                is_rep = false;
+            }
+            i += split_point;
+        }
+        if is_rep {
             return true;
         }
+
+        // original solution: fairly straightforward, but requires us to convert
+        // char slices into strings
+        //
+        // if s.as_str()
+        //     .chars()
+        //     .chunks(split_point)
+        //     .into_iter()
+        //     .map(|chunk| chunk.collect::<String>())
+        //     .tuple_windows::<(_, _)>()
+        //     .all(|(x, y)| x == y)
+        // {
+        //     return true;
+        // }
     }
 
     return false;
