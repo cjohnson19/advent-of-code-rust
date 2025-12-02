@@ -63,14 +63,11 @@ pub fn part_two(input: &str) -> Option<u64> {
         }
         match dir {
             Dir::Left => {
-                let mut new_pos = pos - n;
-                if new_pos <= 0 {
-                    // new_pos may be negative, but we don't count it as another
+                let new_pos = pos + (100 - n);
+                if new_pos <= 100 && pos != 0 {
+                    // new_pos may be "negative", but we don't count it as another
                     // pass over 0 if the previous motion ended at 0
-                    if pos != 0 {
-                        ans += 1;
-                    }
-                    new_pos = 100 - new_pos.abs();
+                    ans += 1;
                 }
                 pos = new_pos;
             }
