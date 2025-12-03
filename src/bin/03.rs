@@ -55,44 +55,50 @@ fn max_joltage(b: &BatteryBank) -> u64 {
     format!("{tens}{ones}").parse().unwrap()
 }
 
-// DP solution for arbitrary `m` numbers to include
+/// Greedy solution for arbitrary `m` numbers to include
+///
+/// The key insight is, if we want `m` characters, we have to include at least
+/// the last `m`. However, for the remaining portion at the start, we can
+/// greedily choose the largest number (which occurs first). Let
+///
+/// Consider a number of length `7` like:
+///    8909127
+/// where we want 3 top numbers. We have to reserve the last 2 and pick the
+/// largest number from the other portion.
+///    8909127
+///         ^^ Reserved, cannot pick from
+///    ----    Want the largest number
+/// The first time, we find the first 9 to be the best, and permit looking at
+/// one more digit
+///    _909127
+///          ^ Reserved
+/// Next time, we find another 9
+///    _9_9127
+///            None Reserved
+/// Finally, we search the remainder and find the 7
+///    _9_9__7
+/// 
+/// ```
+/// assert_eq!(max_joltage_m("8909127".parse().unwrap()), 997);
+/// ```
+///
+/// Note, this is actually the general version of what I did for [`max_joltage`]
 fn max_joltage_m(b: &BatteryBank, m: usize) -> u64 {
-    let n = b.0.len();
-    let mut dp = vec![vec![0u64; n + 1]; m + 1];
-    // initial, fill out the basic portion of the table where we take the first
-    // `m` digits and call that good.
-    for i in 1..=m {
-        for j in i..=n {
-            dp[i][j] = dp[i - 1][j - 1] * 10 + b.0[j - 1];
+    let n = b.len();
+    let mut m = m;
+    let mut cur_best_idx = 0;
+    let mut res = 0;
+    while m > 0 {
+        for i in (cur_best_idx + 1)..=(n - m) {
+            if b[i] > b[cur_best_idx] {
+                cur_best_idx = i;
+            }
         }
+        res = (res * 10) + b[cur_best_idx];
+        cur_best_idx += 1;
+        m -= 1;
     }
-
-    // Now consider changing some digits around
-    for i in 2..=m {
-        for j in (i + 1)..=n {
-            // Take the best joltage from the previous version which did not
-            // rely on this number and add on this one
-            let choose_this_digit = dp[i - 1][j - 1] * 10 + b.0[j - 1];
-            // The best one we've seen so far
-            let keep_previous_best = dp[i][j - 1];
-            // The best one we've seen so far, but replace the last digit with
-            // this one.
-            let remove_previous_digit = remove_last_digit(dp[i][j - 1]) + b.0[j - 1];
-            // Whatever solution we currently have
-            let current = dp[i][j];
-            // Our new best here is the maximum of all of those possible choices
-            dp[i][j] = choose_this_digit
-                .max(keep_previous_best)
-                .max(current)
-                .max(remove_previous_digit);
-        }
-    }
-
-    dp[m][dp[0].len() - 1]
-}
-
-fn remove_last_digit(n: u64) -> u64 {
-    n / 10 * 10
+    res
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -125,10 +131,5 @@ mod tests {
     fn test_part_two_single() {
         let b: BatteryBank = "234234".parse().unwrap();
         assert_eq!(max_joltage_m(&b, 3), 434);
-    }
-
-    #[test]
-    fn remove_last() {
-        assert_eq!(remove_last_digit(13), 10);
     }
 }
