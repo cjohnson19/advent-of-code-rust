@@ -1,6 +1,4 @@
-use std::{collections::HashSet, ops::Range, str::FromStr};
-
-use itertools::Itertools;
+use std::{ops::Range, str::FromStr};
 
 advent_of_code::solution!(2);
 
@@ -25,9 +23,12 @@ impl FromStr for IDRange {
     }
 }
 
-impl Into<Range<usize>> for IDRange {
-    fn into(self) -> Range<usize> {
-        self.low.parse().unwrap()..(self.high.parse::<usize>().unwrap() + 1)
+impl From<IDRange> for Range<usize> {
+    fn from(value: IDRange) -> Self {
+        Self {
+            start: value.low.parse().unwrap(),
+            end: value.high.parse::<usize>().unwrap() + 1,
+        }
     }
 }
 
@@ -87,7 +88,7 @@ fn is_n_repetitions(n: usize) -> bool {
         // }
     }
 
-    return false;
+    false
 }
 
 pub fn part_one(input: &str) -> Option<u64> {

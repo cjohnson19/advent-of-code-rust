@@ -79,7 +79,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 }
             }
         }
-        pos = pos % 100;
+        pos %= 100;
     }
 
     Some(ans)

@@ -59,7 +59,7 @@ fn max_joltage(b: &BatteryBank) -> u64 {
 ///
 /// The key insight is, if we want `m` characters, we have to include at least
 /// the last `m`. However, for the remaining portion at the start, we can
-/// greedily choose the largest number (which occurs first). Let
+/// greedily choose the largest number (which occurs first).
 ///
 /// Consider a number of length `7` like:
 ///    8909127
@@ -77,7 +77,7 @@ fn max_joltage(b: &BatteryBank) -> u64 {
 ///            None Reserved
 /// Finally, we search the remainder and find the 7
 ///    _9_9__7
-/// 
+///
 /// ```
 /// assert_eq!(max_joltage_m("8909127".parse().unwrap()), 997);
 /// ```
