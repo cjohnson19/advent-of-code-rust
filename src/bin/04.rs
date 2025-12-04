@@ -34,12 +34,12 @@ impl FromStr for Grid {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let rows: Vec<_> = s.lines().collect();
+        let rows = s.lines().collect::<Vec<_>>();
         let height = rows.len();
         let width = rows[0].len();
 
-        let taken = s
-            .lines()
+        let taken = rows
+            .iter()
             .enumerate()
             .flat_map(|(i, l)| {
                 l.char_indices()
@@ -63,17 +63,13 @@ fn num_tp_neighbors(g: &Grid, x: usize, y: usize) -> u64 {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let g: Grid = input.parse().unwrap();
-    let mut ans = 0;
-    for i in 0..g.height {
-        for j in 0..g.width {
-            if g.taken.contains(&(j, i)) && num_tp_neighbors(&g, j, i) < 4 {
-                ans += 1;
-            }
-        }
-    }
-
-    Some(ans)
+    let g = input.parse::<Grid>().unwrap();
+    Some(
+        g.taken
+            .iter()
+            .filter(|(j, i)| num_tp_neighbors(&g, *j, *i) < 4)
+            .count() as u64,
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
