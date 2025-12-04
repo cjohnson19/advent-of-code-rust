@@ -1,4 +1,8 @@
-use std::{collections::HashSet, fmt, str::FromStr};
+use std::{
+    collections::{HashMap, HashSet, VecDeque},
+    fmt,
+    str::FromStr,
+};
 
 use advent_of_code::all_neighbors;
 
@@ -73,23 +77,30 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let mut g: Grid = input.parse().unwrap();
+    let g: Grid = input.parse().unwrap();
+    let mut count_map = HashMap::new();
+    let mut queue = VecDeque::new();
     let mut ans = 0;
-    loop {
-        let start_tp_count = g.taken.len();
-        for i in 0..g.height {
-            for j in 0..g.width {
-                if g.taken.contains(&(j, i)) && num_tp_neighbors(&g, j, i) < 4 {
-                    ans += 1;
-                    g.taken.remove(&(j, i));
-                }
-            }
+
+    for (j, i) in &g.taken {
+        let neighbors = num_tp_neighbors(&g, *j, *i);
+        if neighbors < 4 {
+            queue.push_back((*j, *i));
         }
-        if start_tp_count == g.taken.len() {
-            break;
-        }
+        count_map.insert((*j, *i), neighbors);
     }
 
+    while let Some((j, i)) = queue.pop_front() {
+        ans += 1;
+        for neighbor in all_neighbors((j, i), g.width, g.height) {
+            count_map.entry(neighbor).and_modify(|e| {
+                *e = *e - 1;
+                if *e == 3 {
+                    queue.push_back(neighbor);
+                }
+            });
+        }
+    }
     Some(ans)
 }
 
