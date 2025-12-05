@@ -1,6 +1,6 @@
 use std::{collections::HashSet, io};
 
-use crate::template::{Day, ANSI_BOLD, ANSI_ITALIC, ANSI_RESET};
+use crate::template::{ANSI_BOLD, ANSI_ITALIC, ANSI_RESET, Day};
 
 use super::{
     all_days,
@@ -67,7 +67,7 @@ pub fn get_path_for_bin(day: Day) -> String {
 /// All solutions live in isolated binaries.
 /// This module encapsulates interaction with these binaries, both invoking them as well as parsing the timing output.
 pub mod child_commands {
-    use super::{get_path_for_bin, Error};
+    use super::{Error, get_path_for_bin};
     use crate::template::Day;
     use std::{
         io::{BufRead, BufReader},
@@ -169,7 +169,9 @@ pub mod child_commands {
     }
 
     fn parse_time(line: &str) -> Option<(&str, f64)> {
-        // for possible time formats, see: https://github.com/rust-lang/rust/blob/1.64.0/library/core/src/time.rs#L1176-L1200
+        // for possible time formats, see:
+        // https://github.com/rust-lang/rust/blob/1.64.0/library/core/src/time.rs#L1176-L1200
+        #[allow(clippy::double_ended_iterator_last)]
         let str_timing = line
             .split(" samples)")
             .next()?

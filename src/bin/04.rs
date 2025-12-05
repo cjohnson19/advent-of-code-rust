@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
+    collections::{HashMap, HashSet},
     fmt,
     str::FromStr,
 };
@@ -79,24 +79,24 @@ pub fn part_one(input: &str) -> Option<u64> {
 pub fn part_two(input: &str) -> Option<u64> {
     let g: Grid = input.parse().unwrap();
     let mut count_map = HashMap::new();
-    let mut queue = VecDeque::new();
+    let mut stack = Vec::new();
     let mut ans = 0;
 
     for (j, i) in &g.taken {
         let neighbors = num_tp_neighbors(&g, *j, *i);
         if neighbors < 4 {
-            queue.push_back((*j, *i));
+            stack.push((*j, *i));
         }
         count_map.insert((*j, *i), neighbors);
     }
 
-    while let Some((j, i)) = queue.pop_front() {
+    while let Some((j, i)) = stack.pop() {
         ans += 1;
         for neighbor in all_neighbors((j, i), g.width, g.height) {
             count_map.entry(neighbor).and_modify(|e| {
-                *e = *e - 1;
+                *e -= 1;
                 if *e == 3 {
-                    queue.push_back(neighbor);
+                    stack.push(neighbor);
                 }
             });
         }
