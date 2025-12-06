@@ -38,3 +38,15 @@ pub fn all_neighbors(
         (nx < w && ny < h).then_some((nx, ny))
     })
 }
+
+pub fn transpose<T>(matrix: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    let n = matrix[0].len();
+    let mut its: Vec<_> = matrix.into_iter().map(|row| row.into_iter()).collect();
+    (0..n)
+        .map(|_| {
+            its.iter_mut()
+                .map(|r| r.next().unwrap())
+                .collect::<Vec<T>>()
+        })
+        .collect()
+}
