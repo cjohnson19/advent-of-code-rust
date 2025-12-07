@@ -39,14 +39,23 @@ pub fn all_neighbors(
     })
 }
 
-pub fn transpose<T>(matrix: Vec<Vec<T>>) -> Vec<Vec<T>> {
-    let n = matrix[0].len();
-    let mut its: Vec<_> = matrix.into_iter().map(|row| row.into_iter()).collect();
-    (0..n)
-        .map(|_| {
-            its.iter_mut()
-                .map(|r| r.next().unwrap())
-                .collect::<Vec<T>>()
-        })
-        .collect()
+pub trait Transpose
+where
+    Self: Sized,
+{
+    fn transpose(self) -> Self;
+}
+
+impl<T> Transpose for Vec<Vec<T>> {
+    fn transpose(self) -> Vec<Vec<T>> {
+        let n = self[0].len();
+        let mut its: Vec<_> = self.into_iter().map(|row| row.into_iter()).collect();
+        (0..n)
+            .map(|_| {
+                its.iter_mut()
+                    .map(|r| r.next().unwrap())
+                    .collect::<Vec<T>>()
+            })
+            .collect()
+    }
 }

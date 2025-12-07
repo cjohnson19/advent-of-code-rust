@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use advent_of_code::transpose;
+use advent_of_code::{Transpose};
 use itertools::Itertools;
 
 advent_of_code::solution!(6);
@@ -51,7 +51,7 @@ impl FromStr for Input {
 
 pub fn part_one(input: &str) -> Option<u64> {
     let input: Input = input.parse().unwrap();
-    let op_nums = transpose(input.numbers);
+    let op_nums = input.numbers.transpose();
     Some(
         input
             .operations
@@ -82,7 +82,8 @@ pub fn part_two(input: &str) -> Option<u64> {
         .map(|line| line.chars().collect())
         .collect();
 
-    let s: String = transpose(c)
+    let s: String = c
+        .transpose()
         .into_iter()
         .map(|col| col.iter().collect::<String>().trim().to_string())
         .join("\n");

@@ -66,26 +66,13 @@ fn is_n_repetitions(n: usize) -> bool {
             // subsequence.
             if i + split_point > l || &s[i..i + split_point] != chunk {
                 is_rep = false;
+                break;
             }
             i += split_point;
         }
         if is_rep {
             return true;
         }
-
-        // original solution: fairly straightforward, but requires us to convert
-        // char slices into strings
-        //
-        // if s.as_str()
-        //     .chars()
-        //     .chunks(split_point)
-        //     .into_iter()
-        //     .map(|chunk| chunk.collect::<String>())
-        //     .tuple_windows::<(_, _)>()
-        //     .all(|(x, y)| x == y)
-        // {
-        //     return true;
-        // }
     }
 
     false
